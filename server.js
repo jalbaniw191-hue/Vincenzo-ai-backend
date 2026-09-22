@@ -25,3 +25,9 @@ app.get("/api/status", (req, res) => {
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Vincenzo AI Backend running on port ${PORT}`);
 });
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "ok",
+    message: "Vincenzo AI API is running"
+  });
+});
