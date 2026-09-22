@@ -31,3 +31,9 @@ app.get("/api/health", (req, res) => {
     message: "Vincenzo AI API is running"
   });
 });
+app.get("/api/test", (req, res) => {
+  res.json({
+    success: true,
+    message: "Vincenzo AI API Test Successful"
+  });
+});
