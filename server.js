@@ -4,6 +4,7 @@ const { Pool } = require("pg");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// JSON support
 app.use(express.json());
 
 // PostgreSQL Database Connection
@@ -20,57 +21,70 @@ app.get("/", (req, res) => {
     success: true,
     project: "Vincenzo AI",
     status: "online",
-    message: "Vincenzo AI Backend is running!"
+    message: "Vincenzo AI Backend is running"
   });
 });
 
-// API Status
+// Status
 app.get("/api/status", (req, res) => {
   res.json({
     success: true,
-    status: "online",
-    service: "Vincenzo AI Backend"
+    project: "Vincenzo AI",
+    status: "online"
   });
 });
 
 // Health Check
-app.get("/api/health", (req, res) => {
-  res.json({
-    status: "ok",
-    message: "Vincenzo AI API is running"
-  });
+app.get("/api/health", async (req, res) => {
+  try {
+    await pool.query("SELECT 1");
+
+    res.json({
+      success: true,
+      server: "online",
+      database: "connected"
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      server: "online",
+      database: "error",
+      message: error.message
+    });
+  }
 });
 
-// API Test
+// Basic API Test
 app.get("/api/test", (req, res) => {
   res.json({
     success: true,
-    message: "Vincenzo AI API Test Successful"
+    message: "API is working"
   });
 });
 
 // Database Test
 app.get("/api/db-test", async (req, res) => {
   try {
-    const result = await pool.query("SELECT NOW() AS time");
+    const result = await pool.query("SELECT NOW() AS current_time");
 
     res.json({
       success: true,
       database: "connected",
-      time: result.rows[0].time
+      message: "PostgreSQL database is working",
+      time: result.rows[0].current_time
     });
   } catch (error) {
-    console.error("Database Error:", error.message);
+    console.error("Database Error:", error);
 
     res.status(500).json({
       success: false,
-      database: "connection failed",
+      database: "not connected",
       error: error.message
     });
   }
 });
 
 // Start Server
-app.listen(PORT, "0.0.0.0", () => {
+app.listen(PORT, () => {
   console.log(`Vincenzo AI Backend running on port ${PORT}`);
 });
